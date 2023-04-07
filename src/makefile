@@ -1,3 +1,4 @@
 
 all:
-	python main.py
+	@echo Running main.py
+	@python main.py
