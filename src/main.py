@@ -58,12 +58,14 @@ if __name__== "__main__":
         preprocessor.go(
             dir_input = DEFAULT_DIR_SIGNALS,
             dir_output = DEFAULT_DIR_SIGNALS_PREPROCESSED,
-            sample_rate_Hz = DEFAULT_SAMPLE_RATE_Hz
+            sample_rate_Hz = DEFAULT_SAMPLE_RATE_Hz,
+            is_remove_silence = True,
         )
         preprocessor.go(
             dir_input = DEFAULT_DIR_NOISES,
             dir_output = DEFAULT_DIR_NOISES_PREPROCESSED,
-            sample_rate_Hz = DEFAULT_SAMPLE_RATE_Hz
+            sample_rate_Hz = DEFAULT_SAMPLE_RATE_Hz,
+            is_remove_silence = False,
         )
 
     if command == "mix":

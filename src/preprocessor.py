@@ -19,7 +19,10 @@ class Preprocessor:
         dir_input,
         dir_output,
         sample_rate_Hz = 16000,
-        is_sum_channels = True,             # sum multiple channels into one?
+        is_sum_channels = True,                     # sum multiple channels into one?
+        is_remove_silence = True,                   # remove silence from the signal?
+        silence_level_dBFS = -60,                   # ...below this level
+        silence_alpha = 0.1,                        # ...with this smoothing
         extension = ".wav"
     ):
         LOG("preprocessing")
@@ -58,6 +61,18 @@ class Preprocessor:
             max_amplitude = (np.max(np.abs(samples)))
             LOG("        scaling from max(abs()) = %6.6f" % (max_amplitude))
             samples = samples / max_amplitude
+
+            if is_remove_silence:
+                smoothed = [samples[0]]
+                silence_level = pow(10.0, silence_level_dBFS/20.0)
+                LOG("        removing silence below level %4.7f" % (silence_level))
+                for i in range(1, len(samples)):
+                    # LOG(i)
+                    # LOG(smoothed)
+                    # LOG(abs(samples[i]))
+                    # LOG(smoothed[i-1])
+                    smoothed.append(silence_alpha * abs(samples[i])  + (1.0 - silence_alpha) * smoothed[i-1])
+                samples = samples[smoothed > silence_level]
 
             new_pathname = "%s/%s.wav" % (dir_output, identifier)
             LOG("        writing to %s" % (new_pathname))
