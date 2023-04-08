@@ -13,7 +13,7 @@ class Trainer:
         LOG("importing Tensorflow with some warnings hidden")
         os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
         import tensorflow as tf
-        LOG("    tensorFlow version:", tf.__version__)
+        LOG("    tensorFlow version: %s" % tf.__version__)
 
         LOG("selecting dataset")
         dataset = tf.keras.datasets.mnist

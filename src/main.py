@@ -9,6 +9,10 @@ from trainer import Trainer
 
 if __name__== "__main__":
 
+    LOG ("---")
+    LOG ("gain-inference")
+    LOG ("---")
+
     # Shows usage for this script
     def usage():
         LOG("usage:")
@@ -42,6 +46,7 @@ if __name__== "__main__":
         trainer = Trainer()
         trainer.go()
 
+    LOG ("PASS")
 
 
 
