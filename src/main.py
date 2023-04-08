@@ -1,51 +1,47 @@
-# https://www.tensorflow.org/tutorials/quickstart/beginner
+# Entry point
+import argparse
+import sys
 
-from log import LOG
-import os
 
-LOG("Importing Tensorflow with some warnings hidden")
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
-import tensorflow as tf
-print("TensorFlow version:", tf.__version__)
+from mixer import Mixer
+from trainer import Trainer
 
-LOG("Selecting dataset")
-dataset = tf.keras.datasets.mnist
+if __name__== "__main__":
 
-LOG("Loading dataset")
-(x_train, y_train), (x_test, y_test) = dataset.load_data()
-x_train, x_test = x_train / 255.0, x_test / 255.0
+    # Shows usage for this script
+    def usage():
+        LOG("usage:")
+        LOG("    mix                            mix the input data into vectors")
 
-LOG("Building mode")
-model = tf.keras.models.Sequential([
-  tf.keras.layers.Flatten(input_shape=(28, 28)),
-  tf.keras.layers.Dense(128, activation='relu'),
-  tf.keras.layers.Dropout(0.2),
-  tf.keras.layers.Dense(10)
-])
+    # Help?
+    if len(sys.argv) <= 2:
+        usage()
+        sys.exit(0)
 
-LOG("Training predictions")
-predictions = model(x_train[:1]).numpy()
-LOG(predictions)
+    # Parse arguments
+    parser = argparse.ArgumentParser(
+        description = 'Gain inference',
+        add_help = False,
+    )
+    parser.add_argument(
+        'command',
+        nargs = "+",
+    )
+    args = parser.parse_args()
 
-LOG("Defining a loss function")
-loss_fn = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
+    # Execute commands
+    command = args.command[0]
 
-LOG("Compiling the model")
-model.compile(
-    optimizer='adam',
-    loss=loss_fn,
-    metrics=['accuracy']
-)
+    if command == "mix":
+        mixer = Mixer()
+        mixer.go()
 
-LOG("Fitting the model")
-model.fit(x_train, y_train, epochs=5)
+    if command == "train":
+        trainer = Trainer()
+        trainer.go()
 
-LOG("Calculating probabilities")
-probability_model = tf.keras.Sequential(
-    [
-        model,
-        tf.keras.layers.Softmax()
-    ]
-)
-LOG(probability_model(x_test[:5]))
+
+
+
+
 

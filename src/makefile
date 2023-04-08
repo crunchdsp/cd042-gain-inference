@@ -1,4 +1,7 @@
 
 all:
-	@echo Running main.py
-	@python main.py
+	@echo Mixing
+	@python main.py mix
+
+	@echo Training
+	@python main.py train
