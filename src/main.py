@@ -3,6 +3,7 @@ import argparse
 import sys
 
 
+from log import LOG
 from mixer import Mixer
 from trainer import Trainer
 
@@ -12,9 +13,10 @@ if __name__== "__main__":
     def usage():
         LOG("usage:")
         LOG("    mix                            mix the input data into vectors")
+        LOG("    train                            mix the input data into vectors")
 
     # Help?
-    if len(sys.argv) <= 2:
+    if len(sys.argv) <= 1:
         usage()
         sys.exit(0)
 
