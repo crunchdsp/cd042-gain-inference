@@ -3,8 +3,9 @@ import os
 
 class Trainer:
 
-    def __init__(self):
+    def __init__(self, args = None):
         LOG("initialising trainer")
+        LOG("    args = %s" % args)
 
     def go(self):
 

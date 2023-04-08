@@ -2,6 +2,7 @@ import inspect
 import os
 import signal
 import sys
+import traceback
 from datetime import datetime
 
 # Returns a timestamp string
@@ -28,3 +29,7 @@ def WARNING(string):
 def DEBUG(string):
     print("[%s] DEBUG %s" % (timestamp(), string))
 
+def ASSERT(condition, string):
+    if not(condition):
+        traceback.print_stack()
+        ERROR("ASSERT %s" % string)

@@ -2,13 +2,24 @@
 
 # Design
 
-## Data model
+## Data generator
 ```
-signals--\           
-          +-[mixer]---{mixed}--[device]---> y={gains}
-noises---/                           \
-                                      +--> x={psds}
+signals-\-----------{clean}---[device]--{clean}-\           
+         \                                       +--[estimator]--> y={gains}
+          +-[mixer]-{noisy}-\-[device]--{dirty}-/                 
+         /                   \                                   
+noises--/                     +----------------------------------> x={dirty}
 ```                     
+
+
+```
+signals-\----------+-{clean}--[device]---> y={ideal gains}           
+         \        /          /       \            
+          +-[mixer]-{noisy}-/         +--> x={noisy audio}                   
+         /                                                              
+noises--/                     
+```                     
+
 ### Parameters
 
 * mixer
@@ -33,15 +44,25 @@ noises---/                           \
 
     * calibration [dBFS-to-dBSPL]
 
-    * gain criteria [dBFS-to-dBSPL]
+* estimator
+    
+    * ignore initial [seconds]
+
+    * block size [samples]
+
+    * window [option]
+
+    * FFT size [samples]
+
+    * calibration [dBFS-to-dBSPL]
 
 
-## Training & validation
+## Trainer
 ```
                                   model---+
                                            \
 y={gains}--\             /-training-set--\  \    
-            +--[loader]-+                 [trainer]--fitted    
+            +--[loader]-+                 [fitter]--fitted    
 x={psds}---/             \-testing-set---/                \
                           \                                \
                            \                                [validate]-> results

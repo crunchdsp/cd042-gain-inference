@@ -1,7 +1,10 @@
 
 all:
-	@echo Mixing
+# 	@echo Preprocessing
+# 	@python main.py preprocess
+
+	@echo Mixing 
 	@python main.py mix
 
-	@echo Training
+	@echo Training 
 	@python main.py train
