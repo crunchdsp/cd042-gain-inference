@@ -2,35 +2,54 @@
 
 # Design
 
-## Data generator
+## Preprocessor
+
+* Resampling
+
+* Amplitude normalisation
+
+* Silence removal
+
+
 ```
-signals-\-----------{signal}---[device]--{clean}-\           
-         \                                       +--[estimator]--> y={gains}
-          +-[mixer]-{mixed}-\-[device]--{dirty}-/                 
-         /                   \                                   
-noises--/                     +----------------------------------> x={dirty}
+signals----[preprocessor]-----{signal}
+noises-----[preprocessor]-----{noises}
+```
+
+## Mixer
+
+* Truncation to common length
+
+* Randomised gain, and sum
+
+```
+signals-\-----------{signal}
+         \
+          +-[mixer]-{mixed}
+         /                   
+noises--/-----------{noise}
 ```                     
 
+## Analyser
+
+* Windowing
+
+* Frequency analysis
+
+* Level calculation = x
+
+* Ideal gain calculation = y
+
 
 ```
-signals-\----------+-{clean}--[device]---> y={ideal gains}           
-         \        /          /       \            
-          +-[mixer]-{noisy}-/         +--> x={noisy audio}                   
-         /                                                              
-noises--/                     
+{signal}--[analyser]-\-----{levels}---x           
+          /           \                 
+{mixed}--/             \---{gains}----y    
+                  
 ```                     
 
 ### Parameters
 
-* mixer
-
-    * sample rate [Hz]
-    
-    * gain
-
-        * signals [linear]
-
-        * noise [linear]
 
 * device
     
@@ -68,22 +87,6 @@ x={psds}---/             \-testing-set---/                \
                            \                                [validate]-> results
                             +=validating-set---------------/
 ```
-
-### Parameters
-
-* load
-    
-    * count [vectors]
-
-* train
-    
-    * optimizer
-
-    * loss function
-    
-    * metrics
-
-    * epochs
 
 
 # Tensorflow

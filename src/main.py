@@ -4,9 +4,11 @@ import random
 import sys
 
 from log import LOG
+from generator import Generator
 from preprocessor import Preprocessor
 from mixer import Mixer
 from trainer import Trainer
+from wola import WOLA
 
 DEFAULT_DIR_INPUT  = "../../data"
 DEFAULT_DIR_OUTPUT = "../../out"
@@ -36,8 +38,9 @@ if __name__== "__main__":
     def usage():
         LOG("usage:")
         LOG("    preprocess                 preprocess the data")
-        LOG("    mix                        mix the input data into vectors")
-        LOG("    train                      mix the input data into vectors")
+        LOG("    mix                        mix the input data into recordings")
+        LOG("    generate                   generate test data from recordings")
+        LOG("    train                      train the model from the test data")
 
     # Help?
     if len(sys.argv) <= 1:
@@ -95,9 +98,17 @@ if __name__== "__main__":
             gains_noises_dB = DEFAULT_GAINS_NOISES_dB,
         )
 
+    if command == "generate":
+        generator = Generator(args.command[1:])
+        generator.go(
+            dir_input = DEFAULT_DIR_SIGNALS_PREPROCESSED,
+            dir_output = DEFAULT_DIR_NOISES_PREPROCESSED,
+        )
+
     if command == "train":
         trainer = Trainer(args.command[1:])
         trainer.go()
+
 
     LOG ("PASS")
 
