@@ -8,7 +8,6 @@ from generator import Generator
 from preprocessor import Preprocessor
 from mixer import Mixer
 from trainer import Trainer
-from wola import WOLA
 
 DEFAULT_DIR_INPUT  = "../../data"
 DEFAULT_DIR_OUTPUT = "../../out"
@@ -23,6 +22,7 @@ DEFAULT_DIR_NOISES = "%s//noises" % DEFAULT_DIR_INPUT
 DEFAULT_DIR_SIGNALS_PREPROCESSED = "%s/preprocessed/signals" % DEFAULT_DIR_OUTPUT
 DEFAULT_DIR_NOISES_PREPROCESSED = "%s/preprocessed/noises" % DEFAULT_DIR_OUTPUT
 DEFAULT_DIR_NOISES_MIXED = "%s/mixed" % DEFAULT_DIR_OUTPUT
+DEFAULT_DIR_NOISES_GENERATED = "%s/generated" % DEFAULT_DIR_OUTPUT
 
 DEFAULT_SAMPLE_RATE_Hz = 16000
 DEFAULT_GAINS_SIGNALS_dB = [-30,  -6]
@@ -101,8 +101,8 @@ if __name__== "__main__":
     if command == "generate":
         generator = Generator(args.command[1:])
         generator.go(
-            dir_input = DEFAULT_DIR_SIGNALS_PREPROCESSED,
-            dir_output = DEFAULT_DIR_NOISES_PREPROCESSED,
+            dir_input = DEFAULT_DIR_NOISES_MIXED,
+            dir_output = DEFAULT_DIR_NOISES_GENERATED,
         )
 
     if command == "train":
