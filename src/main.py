@@ -1,5 +1,6 @@
 # Entry point
 import argparse
+import random
 import sys
 
 from log import LOG
@@ -9,6 +10,8 @@ from trainer import Trainer
 
 DEFAULT_DIR_INPUT  = "../../data"
 DEFAULT_DIR_OUTPUT = "../../out"
+
+DEFAULT_SEED = None
 
 # Inputs
 DEFAULT_DIR_SIGNALS = "%s/signals" % DEFAULT_DIR_INPUT
@@ -20,8 +23,8 @@ DEFAULT_DIR_NOISES_PREPROCESSED = "%s/preprocessed/noises" % DEFAULT_DIR_OUTPUT
 DEFAULT_DIR_NOISES_MIXED = "%s/mixed" % DEFAULT_DIR_OUTPUT
 
 DEFAULT_SAMPLE_RATE_Hz = 16000
-DEFAULT_GAINS_SIGNALS_dB = [-60,  0]
-DEFAULT_GAINS_NOISES_dB  = [-60,  0]
+DEFAULT_GAINS_SIGNALS_dB = [-30,  -6]
+DEFAULT_GAINS_NOISES_dB  = [-30,  -6]
 
 if __name__== "__main__":
 
@@ -51,15 +54,19 @@ if __name__== "__main__":
         nargs = "+",
     )
     parser.add_argument(
-        '--clean', 
-        action='store_true',
-        default=False,
-        help="Clean the output directory",
-        dest='is_clean',
+        '--seed', 
+        action='store',
+        default=DEFAULT_SEED,
+        help="Random seed, default = %s" % DEFAULT_SEED,
+        dest='seed',
     )
-
     args = parser.parse_args()
 
+    # Random seed
+    if args.seed is not None:
+        LOG("Setting random seed to %s" % args.seed)
+        random.seed(args.seed)
+        
     # Execute commands
     command = args.command[0]
 

@@ -24,7 +24,8 @@ class Mixer:
             dir_output,
             gains_signals_dB,           # [min_gain_dB max_gain_dB] for signals
             gains_noises_dB,            # [min_gain_dB max_gain_dB] for noises
-            number_of_outputs = 100     # number of combinations to mix
+            number_of_outputs = 100,    # number of combinations to mix
+            extension = ".wav"
         ):
         LOG("mixing")
         LOG("    signals from %s" % dir_signals)
@@ -33,15 +34,16 @@ class Mixer:
         LOG("    signal gains between  %s dB" % gains_signals_dB)
         LOG("    noise gains between  %s dB" % gains_noises_dB)
         LOG("    mixing %s outputs" % number_of_outputs)
+        LOG("    extension '%s'" % extension)
 
         LOG("getting the signals file list")
-        pattern = "%s/*" % (dir_signals)
+        pattern = "%s/*%s" % (dir_signals, extension)
         filenames_signals = glob.glob(pattern)
         LOG("    found %d files" % len(filenames_signals))
         ASSERT(len(filenames_signals)>0, "No files found in %s" % dir_signals)
 
         LOG("getting the noises file list")
-        pattern = "%s/*" % (dir_noises)
+        pattern = "%s/*%s" % (dir_noises, extension)
         filenames_noises = glob.glob(pattern)
         LOG("    found %d files" % len(filenames_noises))
         ASSERT(len(filenames_noises)>0, "No files found in %s" % dir_noises)

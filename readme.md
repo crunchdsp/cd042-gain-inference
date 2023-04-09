@@ -6,7 +6,7 @@
 ```
 signals-\-----------{clean}---[device]--{clean}-\           
          \                                       +--[estimator]--> y={gains}
-          +-[mixer]-{noisy}-\-[device]--{dirty}-/                 
+          +-[mixer]-{mixed}-\-[device]--{dirty}-/                 
          /                   \                                   
 noises--/                     +----------------------------------> x={dirty}
 ```                     
