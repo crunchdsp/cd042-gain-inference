@@ -7,19 +7,21 @@ from preprocessor import Preprocessor
 from mixer import Mixer
 from trainer import Trainer
 
+DEFAULT_DIR_INPUT  = "../../data"
+DEFAULT_DIR_OUTPUT = "../../out"
 
-DEFAULT_DIR_SIGNALS = "../../data/in/signals"
-DEFAULT_DIR_NOISES = "../../data/in/noises"
+# Inputs
+DEFAULT_DIR_SIGNALS = "%s/signals" % DEFAULT_DIR_INPUT
+DEFAULT_DIR_NOISES = "%s//noises" % DEFAULT_DIR_INPUT
 
-DEFAULT_DIR_SIGNALS_PREPROCESSED = "../../data/preprocessed/signals"
-DEFAULT_DIR_NOISES_PREPROCESSED = "../../data/preprocessed/noises"
-
-DEFAULT_DIR_NOISES_MIXED = "../../data/mixed"
+# Outputs
+DEFAULT_DIR_SIGNALS_PREPROCESSED = "%s/preprocessed/signals" % DEFAULT_DIR_OUTPUT
+DEFAULT_DIR_NOISES_PREPROCESSED = "%s/preprocessed/noises" % DEFAULT_DIR_OUTPUT
+DEFAULT_DIR_NOISES_MIXED = "%s/mixed" % DEFAULT_DIR_OUTPUT
 
 DEFAULT_SAMPLE_RATE_Hz = 16000
 DEFAULT_GAINS_SIGNALS_dB = [-60,  0]
 DEFAULT_GAINS_NOISES_dB  = [-60,  0]
-
 
 if __name__== "__main__":
 
@@ -48,6 +50,14 @@ if __name__== "__main__":
         'command',
         nargs = "+",
     )
+    parser.add_argument(
+        '--clean', 
+        action='store_true',
+        default=False,
+        help="Clean the output directory",
+        dest='is_clean',
+    )
+
     args = parser.parse_args()
 
     # Execute commands

@@ -19,17 +19,18 @@ class Preprocessor:
         dir_input,
         dir_output,
         sample_rate_Hz = 16000,
-        is_sum_channels = True,                     # sum multiple channels into one?
         is_remove_silence = True,                   # remove silence from the signal?
+        silence_smoothing_samples = 10,             # ...using box smoothing over this number of samples
         silence_level_dBFS = -60,                   # ...below this level
-        silence_alpha = 0.1,                        # ...with this smoothing
         extension = ".wav"
     ):
         LOG("preprocessing")
         LOG("    from %s" % dir_input)
         LOG("    to   %s" % dir_output)
         LOG("    sample rate %d Hz" % sample_rate_Hz)
-        LOG("    is_sum_channels is %s" % is_sum_channels)
+        LOG("    removing silence %s" % is_remove_silence)
+        LOG("        smoothing by %s samples" % silence_smoothing_samples)
+        LOG("        removing under %4.2fdBFS" % silence_level_dBFS)
         LOG("    extension '%s'" % extension)
 
         LOG("getting the file list")
@@ -63,15 +64,15 @@ class Preprocessor:
             samples = samples / max_amplitude
 
             if is_remove_silence:
-                smoothed = [samples[0]]
+
+                # Returns box-convolved smoothed samples
+                def smooth(x, length):
+                    box = np.ones(length)/length
+                    return np.convolve(x, box, mode='same')
+
                 silence_level = pow(10.0, silence_level_dBFS/20.0)
                 LOG("        removing silence below level %4.7f" % (silence_level))
-                for i in range(1, len(samples)):
-                    # LOG(i)
-                    # LOG(smoothed)
-                    # LOG(abs(samples[i]))
-                    # LOG(smoothed[i-1])
-                    smoothed.append(silence_alpha * abs(samples[i])  + (1.0 - silence_alpha) * smoothed[i-1])
+                smoothed = smooth(np.abs(samples), silence_smoothing_samples)
                 samples = samples[smoothed > silence_level]
 
             new_pathname = "%s/%s.wav" % (dir_output, identifier)
