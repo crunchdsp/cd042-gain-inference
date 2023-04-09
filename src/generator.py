@@ -4,6 +4,8 @@ import glob
 import random
 import pathlib
 import scipy.io.wavfile
+import matplotlib.pyplot as plt
+import numpy as np
 
 from log import LOG, ASSERT
 from analyser import Analyser
@@ -46,21 +48,41 @@ class Generator:
         pathlib.Path(dir_output).mkdir(parents=True, exist_ok=True)
 
         LOG("calculating gains and levels for every input")
-        analyser = Analyser(
-            fft_length = 128,
-            hop_length = 64,
-        )
+
+        FFT_LENGTH = 1024
+        HOP_LENGTH = 512
+        # COLOURMAP = "hot"
+        # COLOURMAP = "jet"
+        # COLOURMAP = "viridis"
+        COLOURMAP = "inferno"
 
         for i in range(len(filenames_signal)):
             filename_signal = filenames_signal[i]
             filename_mixed = filenames_mixed[i]
-            identifier = "%6.6d" % i
+            identifier = "[%6.6d] %s %s" % (i, filename_signal, filename_mixed)
+            LOG("%s" % (identifier))
 
-            LOG("[%6.6d] " % i)
-
-            LOG("    reading input")
+            # Read signal and convert to levels
+            analyser = Analyser(
+                fft_length = FFT_LENGTH,
+                hop_length = HOP_LENGTH,
+            )
             sample_rate_Hz_signal, signal = scipy.io.wavfile.read(filename_signal)
+            levels_dBSPL_signal = np.array(analyser.go(signal))
 
-            LOG("    analysing")
-            levels = analyser.go(signal)
+            # Read mixed and convert to levels
+            analyser = Analyser(
+                fft_length = FFT_LENGTH,
+                hop_length = HOP_LENGTH,
+            )
+            sample_rate_Hz_mixed, mixed = scipy.io.wavfile.read(filename_mixed)
+            levels_dBSPL_mixed = np.array(analyser.go(mixed))
+
+            # Plot
+            fig, axs = plt.subplots(2)
+            fig.suptitle("%6.6d\n%s\n%s" % (i, filename_signal, filename_mixed))
+            axs[0].imshow(np.rot90(levels_dBSPL_signal), cmap=COLOURMAP)
+            axs[1].imshow(np.rot90(levels_dBSPL_mixed), cmap=COLOURMAP)
+            plt.savefig("%s/%6.6d.png" % (dir_output, i))
+
 

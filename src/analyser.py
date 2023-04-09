@@ -30,7 +30,6 @@ class Analyser:
             self,
             samples,
         ):
-        LOG("analysis")
 
         first = 0
         self.levels_linear = []
@@ -47,18 +46,12 @@ class Analyser:
             y = np.fft.fft(windowed)
 
             # Calculate the levels
-            levels = np.abs(y)
-            levels = levels[0:(self.number_of_bins)]
-
+            levels = np.abs(y[0:(self.number_of_bins)])
             self.levels_linear.append(levels)
             self.levels_dBSPL.append(self.dBFS_to_dBSPL + 20.0 * np.log10(levels))
-
-            LOG(self.levels_linear)
-            LOG(self.levels_dBSPL)
-
 
             # Next block
             first += self.hop_length
 
-            ASSERT(first < 100, "EXIT")
+        return self.levels_dBSPL
 
