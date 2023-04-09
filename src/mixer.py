@@ -82,8 +82,18 @@ class Mixer:
             LOG("    scaling and summing")
             scale_s = pow(10.0, gs/20)
             scale_n = pow(10.0, gn/20)
-            output = scale_s * signal + scale_n * noise
+            signal = scale_s * signal
+            noise  = scale_n * noise
+            output = signal + noise
 
-            filename_output = "%s/%s.wav" % (dir_output, identifier)
-            LOG("    writing to %s" % (filename_output))
+            filename_output = "%s/%s.signal.wav" % (dir_output, identifier)
+            LOG("    writing signal to %s" % (filename_output))
+            scipy.io.wavfile.write(filename_output, sample_rate_Hz_output, signal)
+
+            filename_output = "%s/%s.noise.wav" % (dir_output, identifier)
+            LOG("    writing noise to %s" % (filename_output))
+            scipy.io.wavfile.write(filename_output, sample_rate_Hz_output, noise)
+
+            filename_output = "%s/%s.mixed.wav" % (dir_output, identifier)
+            LOG("    writing mixed to %s" % (filename_output))
             scipy.io.wavfile.write(filename_output, sample_rate_Hz_output, output)

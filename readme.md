@@ -4,7 +4,7 @@
 
 ## Data generator
 ```
-signals-\-----------{clean}---[device]--{clean}-\           
+signals-\-----------{signal}---[device]--{clean}-\           
          \                                       +--[estimator]--> y={gains}
           +-[mixer]-{mixed}-\-[device]--{dirty}-/                 
          /                   \                                   
