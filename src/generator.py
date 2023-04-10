@@ -23,6 +23,8 @@ class Generator:
             self,
             dir_input,
             dir_output,
+            fft_length,
+            hop_length,
             extension = ".wav"
         ):
         LOG("generator")
@@ -43,20 +45,13 @@ class Generator:
         LOG("    found %d mixed files" % len(filenames_mixed))
         ASSERT(len(filenames_mixed)>0, "No mixed files found in %s" % dir_input)
         ASSERT(len(filenames_signal) == len(filenames_mixed), "Expecting equal number of signals and mixed recordings")
+        number_of_scenarios = len(filenames_signal)
 
         LOG("creating output directory")
         pathlib.Path(dir_output).mkdir(parents=True, exist_ok=True)
 
         LOG("calculating gains and levels for every input")
-
-        FFT_LENGTH = 1024
-        HOP_LENGTH = 512
-        # COLOURMAP = "hot"
-        # COLOURMAP = "jet"
-        # COLOURMAP = "viridis"
-        COLOURMAP = "inferno"
-
-        for i in range(len(filenames_signal)):
+        for i in range(number_of_scenarios):
             filename_signal = filenames_signal[i]
             filename_mixed = filenames_mixed[i]
             identifier = "[%6.6d] %s %s" % (i, filename_signal, filename_mixed)
@@ -64,25 +59,39 @@ class Generator:
 
             # Read signal and convert to levels
             analyser = Analyser(
-                fft_length = FFT_LENGTH,
-                hop_length = HOP_LENGTH,
+                fft_length = fft_length,
+                hop_length = hop_length,
             )
             sample_rate_Hz_signal, signal = scipy.io.wavfile.read(filename_signal)
-            levels_dBSPL_signal = np.array(analyser.go(signal))
+            levels_dBSPL_signal, levels_linear_signal = np.array(analyser.go(signal))
 
             # Read mixed and convert to levels
             analyser = Analyser(
-                fft_length = FFT_LENGTH,
-                hop_length = HOP_LENGTH,
+                fft_length = fft_length,
+                hop_length = hop_length,
             )
             sample_rate_Hz_mixed, mixed = scipy.io.wavfile.read(filename_mixed)
-            levels_dBSPL_mixed = np.array(analyser.go(mixed))
+            levels_dBSPL_mixed, levels_linear_mixed = np.array(analyser.go(mixed))
 
-            # Plot
-            fig, axs = plt.subplots(2)
-            fig.suptitle("%6.6d\n%s\n%s" % (i, filename_signal, filename_mixed))
-            axs[0].imshow(np.rot90(levels_dBSPL_signal), cmap=COLOURMAP)
-            axs[1].imshow(np.rot90(levels_dBSPL_mixed), cmap=COLOURMAP)
-            plt.savefig("%s/%6.6d.png" % (dir_output, i))
-
-
+            # Plots a pair of subplots
+            def plot_pair(title, top, bottom, pathname):
+                PLOT_TITLE_FONTSIZE = 10
+                PLOT_SUBTITLE_FONTSIZE = 8
+                PLOT_COLOURMAP = "inferno"
+                PLOT_DPI = 300
+                PLOT_ASPECT = 'auto'
+                PLOT_HSPACE = 0.5
+                fig, axs = plt.subplots(2)
+                fig.suptitle(title, fontsize=PLOT_TITLE_FONTSIZE)
+                axs[0].imshow(np.rot90(top), cmap=PLOT_COLOURMAP, aspect=PLOT_ASPECT)
+                axs[0].set_title(filename_signal, fontsize = PLOT_SUBTITLE_FONTSIZE)
+                axs[1].imshow(np.rot90(bottom), cmap=PLOT_COLOURMAP, aspect=PLOT_ASPECT)
+                axs[1].set_title(filename_mixed, fontsize = PLOT_SUBTITLE_FONTSIZE)
+                plt.subplots_adjust(hspace = PLOT_HSPACE)
+                plt.savefig(pathname, dpi = PLOT_DPI)
+            plot_pair(
+                title = "%6.6d" % (i),
+                top = levels_dBSPL_signal,
+                bottom = levels_dBSPL_mixed,
+                pathname = "%s/%6.6d.png" % (dir_output, i)
+            )

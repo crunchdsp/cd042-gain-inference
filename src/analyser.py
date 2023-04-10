@@ -32,8 +32,8 @@ class Analyser:
         ):
 
         first = 0
-        self.levels_linear = []
-        self.levels_dBSPL = []
+        levels_linear = []
+        levels_dBSPL = []
         while True:
 
             # Done
@@ -47,11 +47,11 @@ class Analyser:
 
             # Calculate the levels
             levels = np.abs(y[0:(self.number_of_bins)])
-            self.levels_linear.append(levels)
-            self.levels_dBSPL.append(self.dBFS_to_dBSPL + 20.0 * np.log10(levels))
+            levels_linear.append(levels)
+            levels_dBSPL.append(self.dBFS_to_dBSPL + 20.0 * np.log10(levels))
 
             # Next block
             first += self.hop_length
 
-        return self.levels_dBSPL
+        return levels_dBSPL, levels_linear
 

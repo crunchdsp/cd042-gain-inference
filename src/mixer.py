@@ -72,10 +72,12 @@ class Mixer:
             ASSERT (sample_rate_Hz_signals == sample_rate_Hz_noises, "Sample rates do not match, found %d and %d" % (sample_rate_Hz_signals, sample_rate_Hz_noises))
             sample_rate_Hz_output = sample_rate_Hz_signals
 
-            len_signals = len(signal)
+            len_signal = len(signal)
             len_noise = len(noise)
-            len_output = min(len_signals, len_noise)
-            LOG("    truncating each to reading %d samples" % (len_output))
+            LOG("    signal %d samples" % (len_signal))
+            LOG("    noise %d samples" % (len_noise))
+            len_output = min(len_signal, len_noise)
+            LOG("        truncating each %d samples" % (len_output))
             signal = signal[0:len_output]
             noise = noise[0:len_output]
 

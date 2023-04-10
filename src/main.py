@@ -25,8 +25,15 @@ DEFAULT_DIR_NOISES_MIXED = "%s/mixed" % DEFAULT_DIR_OUTPUT
 DEFAULT_DIR_NOISES_GENERATED = "%s/generated" % DEFAULT_DIR_OUTPUT
 
 DEFAULT_SAMPLE_RATE_Hz = 16000
+
+DEFAULT_IS_REMOVE_SILENCE_SIGNALS = True
+DEFAULT_IS_REMOVE_SILENCE_NOISES = True
+
 DEFAULT_GAINS_SIGNALS_dB = [-30,  -6]
 DEFAULT_GAINS_NOISES_dB  = [-30,  -6]
+
+DEFAULT_FFT_LENGTH = 128                    # 125Hz bins @ 4ms
+DEFAULT_HOP_LENGTH = 64
 
 if __name__== "__main__":
 
@@ -79,13 +86,13 @@ if __name__== "__main__":
             dir_input = DEFAULT_DIR_SIGNALS,
             dir_output = DEFAULT_DIR_SIGNALS_PREPROCESSED,
             sample_rate_Hz = DEFAULT_SAMPLE_RATE_Hz,
-            is_remove_silence = True,
+            is_remove_silence = DEFAULT_IS_REMOVE_SILENCE_SIGNALS,
         )
         preprocessor.go(
             dir_input = DEFAULT_DIR_NOISES,
             dir_output = DEFAULT_DIR_NOISES_PREPROCESSED,
             sample_rate_Hz = DEFAULT_SAMPLE_RATE_Hz,
-            is_remove_silence = False,
+            is_remove_silence = DEFAULT_IS_REMOVE_SILENCE_NOISES,
         )
 
     if command == "mix":
@@ -103,6 +110,8 @@ if __name__== "__main__":
         generator.go(
             dir_input = DEFAULT_DIR_NOISES_MIXED,
             dir_output = DEFAULT_DIR_NOISES_GENERATED,
+            fft_length = DEFAULT_FFT_LENGTH,
+            hop_length = DEFAULT_HOP_LENGTH,
         )
 
     if command == "train":
