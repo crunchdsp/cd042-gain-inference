@@ -73,25 +73,43 @@ class Generator:
             sample_rate_Hz_mixed, mixed = scipy.io.wavfile.read(filename_mixed)
             levels_dBSPL_mixed, levels_linear_mixed = np.array(analyser.go(mixed))
 
-            # Plots a pair of subplots
-            def plot_pair(title, top, bottom, pathname):
+
+            # Calculate the ideal gains
+            LEVEL_EPS = 1e-12
+            ideal_gains_linear = np.divide (levels_linear_signal, levels_linear_mixed + LEVEL_EPS)
+            ideal_gains_dB = 20.0 * np.log10(ideal_gains_linear+1e-12);
+
+            # Plots 
+            def plot_heatmaps(title, top_title, top, middle_title, middle, bottom_title, bottom, pathname):
                 PLOT_TITLE_FONTSIZE = 10
                 PLOT_SUBTITLE_FONTSIZE = 8
                 PLOT_COLOURMAP = "inferno"
                 PLOT_DPI = 300
                 PLOT_ASPECT = 'auto'
                 PLOT_HSPACE = 0.5
-                fig, axs = plt.subplots(2)
+                PLOT_ORIGIN = 'lower'
+                fig, axs = plt.subplots(3)
                 fig.suptitle(title, fontsize=PLOT_TITLE_FONTSIZE)
-                axs[0].imshow(np.rot90(top), cmap=PLOT_COLOURMAP, aspect=PLOT_ASPECT)
-                axs[0].set_title(filename_signal, fontsize = PLOT_SUBTITLE_FONTSIZE)
-                axs[1].imshow(np.rot90(bottom), cmap=PLOT_COLOURMAP, aspect=PLOT_ASPECT)
-                axs[1].set_title(filename_mixed, fontsize = PLOT_SUBTITLE_FONTSIZE)
+                axs[0].imshow(top.T, cmap=PLOT_COLOURMAP, aspect=PLOT_ASPECT, origin = PLOT_ORIGIN)
+                axs[0].set_title(top_title, fontsize = PLOT_SUBTITLE_FONTSIZE)
+                axs[1].imshow(middle.T, cmap=PLOT_COLOURMAP, aspect=PLOT_ASPECT, origin = PLOT_ORIGIN)
+                axs[1].set_title(middle_title, fontsize = PLOT_SUBTITLE_FONTSIZE)
+                axs[2].imshow(bottom.T, cmap=PLOT_COLOURMAP, aspect=PLOT_ASPECT, origin = PLOT_ORIGIN)
+                axs[2].set_title(bottom_title, fontsize = PLOT_SUBTITLE_FONTSIZE)
                 plt.subplots_adjust(hspace = PLOT_HSPACE)
                 plt.savefig(pathname, dpi = PLOT_DPI)
-            plot_pair(
+
+            plot_heatmaps(
                 title = "%6.6d" % (i),
+                top_title = "signal (dB)",
                 top = levels_dBSPL_signal,
-                bottom = levels_dBSPL_mixed,
+                middle_title = "signal+noise (dB)",
+                middle = levels_dBSPL_mixed,
+                bottom_title = "gains (dB)",
+                bottom = ideal_gains_dB,
                 pathname = "%s/%6.6d.png" % (dir_output, i)
             )
+
+
+            # Save data
+                #https://www.tensorflow.org/tutorials/load_data/numpy
