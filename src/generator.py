@@ -25,16 +25,21 @@ class Generator:
             dir_output,
             fft_length,
             hop_length,
+            sample_rate_Hz = 16000,
             gain_limits_dB = [-12, 0],
-            stacking = [0,1,2,4,8,16,32,64],                     # a list [n0,n1,...] to define the stacking of past levels
+            stacking = [0,1,2,4,8,16,32,64,128,256,512,1024],                     # a list [n0,n1,...] to define the stacking of past levels
             extension = ".wav"
         ):
+
+        seconds_per_frame = hop_length / sample_rate_Hz
+
         LOG("generator")
         LOG("    inputs from %s" % dir_input)
         LOG("    outputs to %s" % dir_output)
         LOG("    analyser")
         LOG("        fft length is %s" % fft_length)
         LOG("        hopping by %s" % hop_length)
+        LOG("            %4.1fs per frame" % seconds_per_frame)
         LOG("    gain limits are %s dB" % gain_limits_dB)
         LOG("    stacking is %s frames" % stacking)
         LOG("    extension is '%s'" % extension)
@@ -126,12 +131,24 @@ class Generator:
             if self.IS_PLOT:
                 PLOT_TITLE_FONTSIZE = 10
                 PLOT_SUBTITLE_FONTSIZE = 8
+                PLOT_XTICKS_FONTSIZE = 5
+                PLOT_YTICKS_FONTSIZE = 5
                 PLOT_COLOURMAP_LEVELS = "inferno"
                 PLOT_COLOURMAP_GAINS = "gray"
                 PLOT_DPI = 300
                 PLOT_ASPECT = 'auto'
-                PLOT_HSPACE = 0.5
+                PLOT_HSPACE = 0.3
                 PLOT_ORIGIN = 'lower'
+
+                # Converts the x-axis from frames to seconds
+                def format_ticks(axis, seconds_per_frame):
+                    # new_labels = []
+                    # for frame in axis.get_xticks():
+                    #     new_labels.append("%4.1f" % (frame * seconds_per_frame))
+                    # axis.set_xticks(axis.get_xticks())
+                    # axis.set_xticklabels(new_labels)
+                    axis.tick_params(axis='x', labelsize=PLOT_XTICKS_FONTSIZE)
+                    axis.tick_params(axis='y', labelsize=PLOT_YTICKS_FONTSIZE)
 
                 fig, axs = plt.subplots(2,2)
                 pathname = "%s/raw.%6.6d.png" % (dir_output, i)
@@ -144,6 +161,10 @@ class Generator:
                 axs[0,1].set_title("mixed", fontsize = PLOT_SUBTITLE_FONTSIZE)
                 axs[1,1].imshow(ideal_gains_dB.T, cmap=PLOT_COLOURMAP_GAINS, aspect=PLOT_ASPECT, origin = PLOT_ORIGIN)
                 axs[1,1].set_title("ideal gains", fontsize = PLOT_SUBTITLE_FONTSIZE)
+                format_ticks(axs[0,0], seconds_per_frame)
+                format_ticks(axs[0,1], seconds_per_frame)
+                format_ticks(axs[1,0], seconds_per_frame)
+                format_ticks(axs[1,1], seconds_per_frame)
                 fig.suptitle("%6.6d" % i, fontsize=PLOT_TITLE_FONTSIZE)
                 plt.subplots_adjust(hspace = PLOT_HSPACE)
                 plt.savefig(pathname, dpi = PLOT_DPI)
@@ -156,6 +177,8 @@ class Generator:
                 axs[0].set_title("mixed stacked %s" % stacking, fontsize = PLOT_SUBTITLE_FONTSIZE)
                 axs[1].imshow(ideal_gains_dB.T, cmap=PLOT_COLOURMAP_GAINS, aspect=PLOT_ASPECT, origin = PLOT_ORIGIN)
                 axs[1].set_title("ideal gains", fontsize = PLOT_SUBTITLE_FONTSIZE)
+                format_ticks(axs[0], seconds_per_frame)
+                format_ticks(axs[1], seconds_per_frame)
                 fig.suptitle("%6.6d" % i, fontsize=PLOT_TITLE_FONTSIZE)
                 plt.subplots_adjust(hspace = PLOT_HSPACE)
                 plt.savefig(pathname, dpi = PLOT_DPI)
