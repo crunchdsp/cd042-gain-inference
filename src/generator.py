@@ -26,7 +26,7 @@ class Generator:
             fft_length,
             hop_length,
             gain_limits_dB = [-12, 0],
-            stacking = [0,1,2,4],                     # a list [n0,n1,...] to define the stacking of past levels
+            stacking = [0,1,2,4,8,16,32,64],                     # a list [n0,n1,...] to define the stacking of past levels
             extension = ".wav"
         ):
         LOG("generator")
