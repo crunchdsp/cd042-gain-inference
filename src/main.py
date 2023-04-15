@@ -99,7 +99,7 @@ if __name__== "__main__":
         )
 
     if command == "mix":
-        mixer = Mixer(args.command[1:])
+        mixer = Mixer()
         mixer.go(
             dir_signals = DEFAULT_DIR_SIGNALS_PREPROCESSED,
             dir_noises = DEFAULT_DIR_NOISES_PREPROCESSED,
@@ -110,7 +110,7 @@ if __name__== "__main__":
         )
 
     if command == "generate":
-        generator = Generator(args.command[1:])
+        generator = Generator()
         generator.go(
             dir_input = DEFAULT_DIR_NOISES_MIXED,
             dir_output = DEFAULT_DIR_NOISES_GENERATED,
@@ -119,7 +119,7 @@ if __name__== "__main__":
         )
 
     if command == "train":
-        trainer = Trainer(args.command[1:])
+        trainer = Trainer()
         trainer.go(
             dir_input = DEFAULT_DIR_NOISES_GENERATED,
             dir_output = DEFAULT_DIR_NOISES_TRAINED,

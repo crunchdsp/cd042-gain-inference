@@ -12,10 +12,8 @@ class Mixer:
 
     def __init__(
         self, 
-        args = None
     ):
         LOG("initialising mixer")
-        LOG("   args = %s" % args)
 
     def go(
             self,
