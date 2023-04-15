@@ -24,7 +24,7 @@ class Mixer:
             dir_output,
             gains_signals_dB,           # [min_gain_dB max_gain_dB] for signals
             gains_noises_dB,            # [min_gain_dB max_gain_dB] for noises
-            number_of_outputs = 32,     # number of combinations to mix
+            number_of_outputs,          # number of combinations to mix
             extension = ".wav"
         ):
         LOG("mixing")

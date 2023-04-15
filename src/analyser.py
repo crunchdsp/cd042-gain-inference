@@ -9,6 +9,8 @@ from log import LOG, ASSERT
 
 class Analyser:
 
+    IS_VERBOSE = True
+
     def __init__(
         self, 
         fft_length = 128,
@@ -30,7 +32,7 @@ class Analyser:
             self,
             samples,
         ):
-
+        blocks = 0
         first = 0
         levels_linear = []
         levels_dBSPL = []
@@ -52,6 +54,7 @@ class Analyser:
 
             # Next block
             first += self.hop_length
+            blocks += 1
 
         return levels_dBSPL, levels_linear
 

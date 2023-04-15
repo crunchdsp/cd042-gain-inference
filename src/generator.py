@@ -25,6 +25,7 @@ class Generator:
             dir_output,
             fft_length,
             hop_length,
+            gain_limits_dB = [-12, 0],
             extension = ".wav"
         ):
         LOG("generator")
@@ -34,7 +35,6 @@ class Generator:
 
         LOG("getting the signal file list")
         pattern = "%s/*.signal%s" % (dir_input, extension)
-        LOG(pattern)
         filenames_signal = glob.glob(pattern)
         LOG("    found %d signal files" % len(filenames_signal))
         ASSERT(len(filenames_signal)>0, "No signal files found in %s" % dir_input)
@@ -51,6 +51,8 @@ class Generator:
         pathlib.Path(dir_output).mkdir(parents=True, exist_ok=True)
 
         LOG("calculating gains and levels for every input")
+        all_levels_dBSPL_mixed = []
+        all_gains_dB = []
         for i in range(number_of_scenarios):
             filename_signal = filenames_signal[i]
             filename_mixed = filenames_mixed[i]
@@ -73,43 +75,50 @@ class Generator:
             sample_rate_Hz_mixed, mixed = scipy.io.wavfile.read(filename_mixed)
             levels_dBSPL_mixed, levels_linear_mixed = np.array(analyser.go(mixed))
 
-
             # Calculate the ideal gains
-            LEVEL_EPS = 1e-12
-            ideal_gains_linear = np.divide (levels_linear_signal, levels_linear_mixed + LEVEL_EPS)
-            ideal_gains_dB = 20.0 * np.log10(ideal_gains_linear+1e-12);
+            ideal_gains_dB = levels_dBSPL_signal - levels_dBSPL_mixed
+            ASSERT((levels_dBSPL_signal <  levels_dBSPL_mixed).any(), "Expecting signal level lower than mixed")
+            ideal_gains_dB = np.maximum(ideal_gains_dB, gain_limits_dB[0])
+            ideal_gains_dB = np.minimum(ideal_gains_dB, gain_limits_dB[1])
+
+            # Record the data
+            LOG(levels_dBSPL_mixed.shape)
+            all_levels_dBSPL_mixed.append(levels_dBSPL_mixed.T)
+            all_gains_dB.append(ideal_gains_dB.T)
 
             # Plots 
-            def plot_heatmaps(title, top_title, top, middle_title, middle, bottom_title, bottom, pathname):
-                PLOT_TITLE_FONTSIZE = 10
-                PLOT_SUBTITLE_FONTSIZE = 8
-                PLOT_COLOURMAP = "inferno"
-                PLOT_DPI = 300
-                PLOT_ASPECT = 'auto'
-                PLOT_HSPACE = 0.5
-                PLOT_ORIGIN = 'lower'
-                fig, axs = plt.subplots(3)
-                fig.suptitle(title, fontsize=PLOT_TITLE_FONTSIZE)
-                axs[0].imshow(top.T, cmap=PLOT_COLOURMAP, aspect=PLOT_ASPECT, origin = PLOT_ORIGIN)
-                axs[0].set_title(top_title, fontsize = PLOT_SUBTITLE_FONTSIZE)
-                axs[1].imshow(middle.T, cmap=PLOT_COLOURMAP, aspect=PLOT_ASPECT, origin = PLOT_ORIGIN)
-                axs[1].set_title(middle_title, fontsize = PLOT_SUBTITLE_FONTSIZE)
-                axs[2].imshow(bottom.T, cmap=PLOT_COLOURMAP, aspect=PLOT_ASPECT, origin = PLOT_ORIGIN)
-                axs[2].set_title(bottom_title, fontsize = PLOT_SUBTITLE_FONTSIZE)
-                plt.subplots_adjust(hspace = PLOT_HSPACE)
-                plt.savefig(pathname, dpi = PLOT_DPI)
+            PLOT_TITLE_FONTSIZE = 10
+            PLOT_SUBTITLE_FONTSIZE = 8
+            PLOT_COLOURMAP = "inferno"
+            PLOT_DPI = 300
+            PLOT_ASPECT = 'auto'
+            PLOT_HSPACE = 0.5
+            PLOT_ORIGIN = 'lower'
+            fig, axs = plt.subplots(3)
+            title = "%6.6d" % (i)
+            top_title = "signal (dB)"
+            top = levels_dBSPL_signal
+            middle_title = "signal+noise (dB)"
+            middle = levels_dBSPL_mixed
+            bottom_title = "gains (dB)"
+            bottom = ideal_gains_dB
+            pathname = "%s/%6.6d.png" % (dir_output, i)
 
-            plot_heatmaps(
-                title = "%6.6d" % (i),
-                top_title = "signal (dB)",
-                top = levels_dBSPL_signal,
-                middle_title = "signal+noise (dB)",
-                middle = levels_dBSPL_mixed,
-                bottom_title = "gains (dB)",
-                bottom = ideal_gains_dB,
-                pathname = "%s/%6.6d.png" % (dir_output, i)
-            )
+            axs[0].imshow(top.T - np.min(top), cmap=PLOT_COLOURMAP, aspect=PLOT_ASPECT, origin = PLOT_ORIGIN)
+            axs[0].set_title(top_title, fontsize = PLOT_SUBTITLE_FONTSIZE)
+
+            axs[1].imshow(middle.T - np.min(middle), cmap=PLOT_COLOURMAP, aspect=PLOT_ASPECT, origin = PLOT_ORIGIN)
+            axs[1].set_title(middle_title, fontsize = PLOT_SUBTITLE_FONTSIZE)
+
+            axs[2].imshow(bottom.T - np.min(bottom), cmap="gray", aspect=PLOT_ASPECT, origin = PLOT_ORIGIN)
+            axs[2].set_title(bottom_title, fontsize = PLOT_SUBTITLE_FONTSIZE)
+
+            fig.suptitle(title, fontsize=PLOT_TITLE_FONTSIZE)
+            plt.subplots_adjust(hspace = PLOT_HSPACE)
+            plt.savefig(pathname, dpi = PLOT_DPI)
 
 
-            # Save data
-                #https://www.tensorflow.org/tutorials/load_data/numpy
+        LOG("saving all data")
+        # np.save("%s/levels_dBSPL_mixed.npy" % dir_output, np.array(all_levels_dBSPL_mixed))
+        # np.save("%s/gains_dB.npy"           % dir_output, np.array(all_gains_dB))
+

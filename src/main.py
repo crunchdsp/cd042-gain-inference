@@ -12,8 +12,6 @@ from trainer import Trainer
 DEFAULT_DIR_INPUT  = "../../data"
 DEFAULT_DIR_OUTPUT = "../../out"
 
-DEFAULT_SEED = None
-
 # Inputs
 DEFAULT_DIR_SIGNALS = "%s/signals" % DEFAULT_DIR_INPUT
 DEFAULT_DIR_NOISES = "%s//noises" % DEFAULT_DIR_INPUT
@@ -23,17 +21,22 @@ DEFAULT_DIR_SIGNALS_PREPROCESSED = "%s/preprocessed/signals" % DEFAULT_DIR_OUTPU
 DEFAULT_DIR_NOISES_PREPROCESSED = "%s/preprocessed/noises" % DEFAULT_DIR_OUTPUT
 DEFAULT_DIR_NOISES_MIXED = "%s/mixed" % DEFAULT_DIR_OUTPUT
 DEFAULT_DIR_NOISES_GENERATED = "%s/generated" % DEFAULT_DIR_OUTPUT
+DEFAULT_DIR_NOISES_TRAINED = "%s/trained" % DEFAULT_DIR_OUTPUT
 
+DEFAULT_SEED = None
 DEFAULT_SAMPLE_RATE_Hz = 16000
 
 DEFAULT_IS_REMOVE_SILENCE_SIGNALS = True
 DEFAULT_IS_REMOVE_SILENCE_NOISES = True
 
 DEFAULT_GAINS_SIGNALS_dB = [-30,  -6]
-DEFAULT_GAINS_NOISES_dB  = [-30,  -6]
+DEFAULT_GAINS_NOISES_dB  = [-48,  -24]
 
-DEFAULT_FFT_LENGTH = 128                    # 125Hz bins @ 4ms
+DEFAULT_FFT_LENGTH = 128                            # 125Hz bins @ 4ms
 DEFAULT_HOP_LENGTH = 64
+
+DEFAULT_NUMBER_OF_MIXED = 8                        # tiny set
+# DEFAULT_NUMBER_OF_MIXED = 32                        # small set
 
 if __name__== "__main__":
 
@@ -103,6 +106,7 @@ if __name__== "__main__":
             dir_output = DEFAULT_DIR_NOISES_MIXED,
             gains_signals_dB = DEFAULT_GAINS_SIGNALS_dB,
             gains_noises_dB = DEFAULT_GAINS_NOISES_dB,
+            number_of_outputs = DEFAULT_NUMBER_OF_MIXED,
         )
 
     if command == "generate":
@@ -116,7 +120,10 @@ if __name__== "__main__":
 
     if command == "train":
         trainer = Trainer(args.command[1:])
-        trainer.go()
+        trainer.go(
+            dir_input = DEFAULT_DIR_NOISES_GENERATED,
+            dir_output = DEFAULT_DIR_NOISES_TRAINED,
+        )
 
 
     LOG ("PASS")
