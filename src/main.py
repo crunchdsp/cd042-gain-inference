@@ -125,7 +125,6 @@ if __name__== "__main__":
             dir_output = DEFAULT_DIR_NOISES_TRAINED,
         )
 
-
     LOG ("PASS")
 
 

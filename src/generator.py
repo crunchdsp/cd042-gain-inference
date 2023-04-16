@@ -189,5 +189,5 @@ class Generator:
         LOG("    level_dBSPL_mixed_stacked")
         np.save("%s/level_dBSPL_mixed_stacked.npy" % dir_output, np.concatenate(all_levels_dBSPL_mixed_stacked))
         LOG("    gains_dB")
-        np.save("%s/gains_dB.npy"           % dir_output, np.concatenate(all_gains_dB))
+        np.save("%s/gains_dB.npy" % dir_output, np.concatenate(all_gains_dB))
 
